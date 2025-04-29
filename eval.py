@@ -152,7 +152,7 @@ if __name__ == '__main__':
 
         print('total_size', descriptors.shape[0], num_queries + num_references)
 
-        testing = True # isinstance(val_dataset, MSLSTest)
+        # testing = True # isinstance(val_dataset, MSLSTest)
 
         preds = get_validation_recalls(
             r_list=r_list,
@@ -162,11 +162,13 @@ if __name__ == '__main__':
             print_results=True,
             dataset_name=val_name,
             faiss_gpu=False,
-            testing=testing,
+            testing=False,
         )
 
-        if testing:
-            val_dataset.save_predictions(preds, args.ckpt_path + '.' + model.agg_arch + '.preds.txt')
+        # print( preds ) 
+        
+        # if testing:
+        #     val_dataset.save_predictions(preds, '../preds.txt')
 
         del descriptors
         print('========> DONE!\n\n')
