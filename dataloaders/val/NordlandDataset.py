@@ -53,3 +53,10 @@ class NordlandDataset(Dataset):
 
     def __len__(self):
         return len(self.images)
+
+    def save_predictions(self, preds, path):
+        with open("preds.txt", 'w') as f:
+            for i in range(len(preds)):
+                q = Path(self.qImages[i]).stem
+                db = ' '.join([Path(self.dbImages[j]).stem for j in preds[i]])
+                f.write(f"{q} {db}\n")
