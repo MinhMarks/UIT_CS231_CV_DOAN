@@ -117,11 +117,11 @@ class SALAD(nn.Module):
         Returns:
             f (torch.Tensor): The global descriptor [B, m*l + g]
         """
-        x, t = x # Extract features and token
-
+        print( "+"*50 ) 
+        print( x.shape ) 
+        
         f = self.cluster_features(x).flatten(2)
         p = self.score(x).flatten(2)
-        t = self.token_features(t)
 
         # Sinkhorn algorithm
         p = get_matching_probs(p, self.dust_bin, 3)
@@ -134,7 +134,6 @@ class SALAD(nn.Module):
         f = f.unsqueeze(2).repeat(1, 1, self.num_clusters, 1)
 
         f = torch.cat([
-            nn.functional.normalize(t, p=2, dim=-1),
             nn.functional.normalize((f * p).sum(dim=-1), p=2, dim=1).flatten(1)
         ], dim=-1)
 

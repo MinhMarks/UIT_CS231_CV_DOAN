@@ -25,7 +25,7 @@ if __name__ == '__main__':
         #     'norm_layer': True,
         # },
 
-        backbone_arch='resnet16',
+        backbone_arch='resnet50',
         backbone_config={
         },
         
