@@ -17,16 +17,12 @@ if __name__ == '__main__':
     )
     
     model = VPRModel(
-        #---- Encoder
-        # backbone_arch='dinov2_vitb14',
-        # backbone_config={
-        #     'num_trainable_blocks': 4,
-        #     'return_token': True,
-        #     'norm_layer': True,
-        # },
-
-        backbone_arch='resnet16',
+        ---- Encoder
+        backbone_arch='dinov2_vitb14',
         backbone_config={
+            'num_trainable_blocks': 4,
+            'return_token': True,
+            'norm_layer': True,
         },
         
         agg_arch='SALAD',
