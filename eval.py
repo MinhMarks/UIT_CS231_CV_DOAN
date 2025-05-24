@@ -55,6 +55,8 @@ def get_val_dataset(dataset_name, image_size=None):
     num_references = ds.num_references
     num_queries = ds.num_queries
     ground_truth = ds.ground_truth
+    # print( "==================  label of some place ==================== ")  
+    # print( ground_truth[:5][1] ) 
     return ds, num_references, num_queries, ground_truth
 
 def get_descriptors(model, dataloader, device):
