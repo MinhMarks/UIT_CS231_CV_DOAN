@@ -72,15 +72,13 @@ def get_descriptors(model, dataloader, device):
 
 def load_model(ckpt_path):
     model = VPRModel(
-        backbone_arch='dinov2_vitb14',
+        backbone_arch='resnet18',
         backbone_config={
-            'num_trainable_blocks': 4,
-            'return_token': True,
-            'norm_layer': True,
         },
+        
         agg_arch='SALAD',
         agg_config={
-            'num_channels': 768,
+            'num_channels': 16,
             'num_clusters': 64,
             'cluster_dim': 128,
             'token_dim': 256,
