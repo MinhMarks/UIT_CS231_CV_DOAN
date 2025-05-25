@@ -120,10 +120,12 @@ class SALAD(nn.Module):
         # print( "+"*50 ) 
         # print( x.shape ) 
 
-        x = x.flatten(2).permute(0,2,1)  
-        x = x.unsqueeze(3)
+        # x = x.flatten(2).permute(0,2,1)  
+        # x = x.unsqueeze(3)
         f = self.cluster_features(x).flatten(2) # .permute(0,2,1) 
 
+        print( x.shape ) 
+        
         # print( f.shape ) 
         p = self.score(x).flatten(2)
         # print( p.shape ) 
@@ -155,6 +157,7 @@ class SALAD(nn.Module):
 
 # # Code adapted from OpenGlue, MIT license
 # # https://github.com/ucuapps/OpenGlue/blob/main/models/superglue/optimal_transport.py
+
 # def log_otp_solver(log_a, log_b, M, num_iters: int = 20, reg: float = 1.0) -> torch.Tensor:
 #     r"""Sinkhorn matrix scaling algorithm for Differentiable Optimal Transport problem.
 #     This function solves the optimization problem and returns the OT matrix for the given parameters.
