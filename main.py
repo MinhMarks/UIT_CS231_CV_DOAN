@@ -5,7 +5,7 @@ from dataloaders.GSVCitiesDataloader import GSVCitiesDataModule
 
 if __name__ == '__main__':        
     datamodule = GSVCitiesDataModule(
-        batch_size=16,
+        batch_size=4,
         img_per_place=4,
         min_img_per_place=4,
         shuffle_all=False, # shuffle all images or keep shuffling in-city only
@@ -33,9 +33,15 @@ if __name__ == '__main__':
         agg_config={
             'num_channels': 768,
             'num_clusters': 64,
-            'cluster_dim': 128,
+            'cluster_dim': 256,
             'token_dim': 256,
         },
+        # agg_config={
+        #     'num_channels': 2048,
+        #     'num_clusters': 64,
+        #     'cluster_dim': 128,
+        #     'token_dim': 256,
+        # },
         lr = 6e-5,
         optimizer='adamw',
         weight_decay=9.5e-9, # 0.001 for sgd and 0 for adam,
