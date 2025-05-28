@@ -21,10 +21,16 @@ def log_otp_solver(log_a, log_b, M, num_iters: int = 20, reg: float = 1.0) -> to
     """
     M = M / reg  # regularization
 
-    u, v = torch.zeros_like(log_a), torch.zeros_like(log_b)
+    log_a = (1 - 1e-6)*log_a + 1e-6*torch.ones_like(log_a)
+    log_b = (1 - 1e-6)*log_b + 1e-6*torch.ones_like(log_b)
 
-    for _ in range(num_iters):
+    u, v = torch.zeros_like(log_a), torch.zeros_like(log_b)
+    
+    temperature_anneal = 0.985
+
+    for i in range(num_iters):
         u = log_a - torch.logsumexp(M + v.unsqueeze(1), dim=2).squeeze()
+        M = M*temperature_anneal
         v = log_b - torch.logsumexp(M + u.unsqueeze(2), dim=1).squeeze()
 
     return M + u.unsqueeze(2) + v.unsqueeze(1)
