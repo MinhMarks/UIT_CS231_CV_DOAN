@@ -25,9 +25,9 @@ if __name__ == '__main__':
             'norm_layer': True,
         },
 
-        # backbone_arch='resnet16',
-        # backbone_config={
-        # },
+        backbone_arch_global='resnet18',
+        backbone_config_global={
+        },
         
         agg_arch='SALAD',
         agg_config={
@@ -36,12 +36,6 @@ if __name__ == '__main__':
             'cluster_dim': 256,
             'token_dim': 256,
         },
-        # agg_config={
-        #     'num_channels': 2048,
-        #     'num_clusters': 64,
-        #     'cluster_dim': 128,
-        #     'token_dim': 256,
-        # },
         lr = 6e-5,
         optimizer='adamw',
         weight_decay=9.5e-9, # 0.001 for sgd and 0 for adam,

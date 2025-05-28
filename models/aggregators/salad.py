@@ -86,7 +86,7 @@ class SALAD(nn.Module):
 
         # MLP for global scene token g
         self.token_features = nn.Sequential(
-            nn.Linear(self.num_channels, 512),
+            nn.Linear(8192, 512),
             nn.ReLU(),
             nn.Linear(512, self.token_dim)
         )
@@ -108,21 +108,25 @@ class SALAD(nn.Module):
         self.dust_bin = nn.Parameter(torch.tensor(1.))
 
 
-    def forward(self, x):
+    def forward(self, x, t ):
         """
         x (tuple): A tuple containing two elements, f and t. 
             (torch.Tensor): The feature tensors (t_i) [B, C, H // 14, W // 14].
             (torch.Tensor): The token tensor (t_{n+1}) [B, C].
 
+        t tensor [ B, C, H , W] , we regaard it as a global token 
         Returns:
             f (torch.Tensor): The global descriptor [B, m*l + g]
         """
-        x, t = x # Extract features and token
+        x, _ = x # Extract features and token
 
+
+        t = t.mean(dim=[2,3]) 
+        
         f = self.cluster_features(x).flatten(2)
         p = self.score(x).flatten(2)
         t = self.token_features(t)
-
+        
         # Sinkhorn algorithm
         p = get_matching_probs(p, self.dust_bin, 3)
         p = torch.exp(p)

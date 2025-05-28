@@ -18,6 +18,9 @@ class VPRModel(pl.LightningModule):
         #---- Backbone
         backbone_arch='resnet50',
         backbone_config={},
+
+        backbone_arch_global ='resnet50',
+        backbone_config_global ={},
         
         #---- Aggregator
         agg_arch='ConvAP',
@@ -46,6 +49,9 @@ class VPRModel(pl.LightningModule):
         # Backbone
         self.encoder_arch = backbone_arch
         self.backbone_config = backbone_config
+
+        self.encoder_arch_global = backbone_arch_global
+        self.backbone_config_global = backbone_config_global
         
         # Aggregator
         self.agg_arch = agg_arch
@@ -75,6 +81,7 @@ class VPRModel(pl.LightningModule):
         # ----------------------------------
         # get the backbone and the aggregator
         self.backbone = helper.get_backbone(backbone_arch, backbone_config)
+        self.backbone_global = helper.get_backbone(backbone_arch_global, backbone_config_global)
         self.aggregator = helper.get_aggregator(agg_arch, agg_config)
 
         # For validation in Lightning v2.0.0
@@ -82,9 +89,9 @@ class VPRModel(pl.LightningModule):
         
     # the forward pass of the lightning model
     def forward(self, x):
-        x = self.backbone(x)
-        
-        x = self.aggregator(x)
+        x_local = self.backbone(x)
+        x_global = self.backbone_global(x) 
+        x = self.aggregator(x_local, x_global)
         return x
     
     # configure the optimizer 
