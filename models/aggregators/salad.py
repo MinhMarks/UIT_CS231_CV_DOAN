@@ -86,7 +86,7 @@ class SALAD(nn.Module):
 
         # MLP for global scene token g
         self.token_features = nn.Sequential(
-            nn.Linear(8192, 512),
+            nn.Linear(512, 512),
             nn.ReLU(),
             nn.Linear(512, self.token_dim)
         )
@@ -118,13 +118,14 @@ class SALAD(nn.Module):
         Returns:
             f (torch.Tensor): The global descriptor [B, m*l + g]
         """
-        x, _ = x # Extract features and token
+        x, tmp = x # Extract features and token
 
 
         t = t.mean(dim=[2,3]) 
-        
+
         f = self.cluster_features(x).flatten(2)
         p = self.score(x).flatten(2)
+        # print( tmp.shape, t.shape )  # [16, 512] 
         t = self.token_features(t)
         
         # Sinkhorn algorithm
