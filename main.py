@@ -3,7 +3,12 @@ import pytorch_lightning as pl
 from vpr_model import VPRModel
 from dataloaders.GSVCitiesDataloader import GSVCitiesDataModule
 
-if __name__ == '__main__':        
+import torch
+
+
+if __name__ == '__main__':    
+    torch.cuda.empty_cache()
+    
     datamodule = GSVCitiesDataModule(
         batch_size=16,
         img_per_place=4,
