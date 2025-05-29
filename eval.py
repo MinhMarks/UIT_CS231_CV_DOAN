@@ -78,13 +78,18 @@ def load_model(ckpt_path):
             'return_token': True,
             'norm_layer': True,
         },
+
+        backbone_arch_global='resnet50',
+        backbone_config_global={
+        },
+        
         agg_arch='SALAD',
         agg_config={
             'num_channels': 768,
             'num_clusters': 64,
-            'cluster_dim': 128,
-            'token_dim': 256,
-        },
+            'cluster_dim': 256,
+            'token_dim': 1024,
+        }
     )
 
     # Load checkpoint

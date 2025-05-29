@@ -25,7 +25,7 @@ if __name__ == '__main__':
             'norm_layer': True,
         },
 
-        backbone_arch_global='resnet18',
+        backbone_arch_global='resnet50',
         backbone_config_global={
         },
         
@@ -34,7 +34,7 @@ if __name__ == '__main__':
             'num_channels': 768,
             'num_clusters': 64,
             'cluster_dim': 256,
-            'token_dim': 256,
+            'token_dim': 1024,
         },
         lr = 6e-5,
         optimizer='adamw',

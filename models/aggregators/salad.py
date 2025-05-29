@@ -53,7 +53,6 @@ def get_matching_probs(S, dustbin_score = 1.0, num_iters=3, reg=1.0):
     )
     return log_P - norm
 
-
 class SALAD(nn.Module):
     """
     This class represents the Sinkhorn Algorithm for Locally Aggregated Descriptors (SALAD) model.
@@ -86,7 +85,7 @@ class SALAD(nn.Module):
 
         # MLP for global scene token g
         self.token_features = nn.Sequential(
-            nn.Linear(512, 512),
+            nn.Linear(2048, 512), # 512    8192  768 
             nn.ReLU(),
             nn.Linear(512, self.token_dim)
         )
@@ -121,8 +120,9 @@ class SALAD(nn.Module):
         x, tmp = x # Extract features and token
 
 
-        t = t.mean(dim=[2,3]) 
-
+        t = t.sum(dim=[2,3]) 
+        # t = t.view(x.size(0), -1) 
+        
         f = self.cluster_features(x).flatten(2)
         p = self.score(x).flatten(2)
         # print( tmp.shape, t.shape )  # [16, 512] 
