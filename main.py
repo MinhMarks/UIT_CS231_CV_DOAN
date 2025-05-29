@@ -17,12 +17,13 @@ if __name__ == '__main__':
     )
     
     model = VPRModel(
-        ---- Encoder
-        backbone_arch='dinov2_vitb14',
+        #---- Encoder
+        backbone_arch='resnet50',  # Đổi thành tên tùy chỉnh cho ResNet SPD
         backbone_config={
-            'num_trainable_blocks': 4,
-            'return_token': True,
-            'norm_layer': True,
+            'model_name': 'resnet50',  # Có thể là resnet50, resnet101, v.v.
+            'pretrained': False,  # Tùy chọn, hiện tại ResNet SPD không hỗ trợ pretrained
+            'layers_to_freeze': 2,
+            'layers_to_crop': [4],  # Ví dụ: crop layer4 để giảm out_channels
         },
         
         agg_arch='SALAD',
