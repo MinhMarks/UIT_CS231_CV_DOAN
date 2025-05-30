@@ -8,6 +8,7 @@ class space_to_depth(nn.Module):
         self.d = dimension
 
     def forward(self, x):
+        # print( " fgs dfg sd gsdfg sdfgs fdgsdfg ssfdgsdfgsfgs fdgsfdg sfg " , x.shape ) 
         return torch.cat([x[..., ::2, ::2], x[..., 1::2, ::2], x[..., ::2, 1::2], x[..., 1::2, 1::2]], 1)
 
 def autopad(k, p=None):
@@ -75,12 +76,12 @@ class BottleNeck(nn.Module):
         return nn.ReLU(inplace=True)(self.residual_function(x) + self.shortcut(x))
 
 class ResNet(nn.Module):
-    def __init__(self, model_name='resnet50', pretrained=True, layers_to_freeze=2, layers_to_crop=[]):
+    def __init__(self, model_name='resnet50', pretrained=True, layers_to_freeze=2, layers_to_crop=[], return_token=False):
         super().__init__()
         self.model_name = model_name.lower()
         self.layers_to_freeze = layers_to_freeze
+        self.return_token = return_token
 
-        # Initialize block and num_block based on model_name
         if 'resnet50' in model_name:
             num_block = [3, 4, 6, 3]
         elif 'resnet101' in model_name:
@@ -88,7 +89,7 @@ class ResNet(nn.Module):
         elif 'resnet152' in model_name:
             num_block = [3, 8, 36, 3]
         elif 'resnet34' in model_name or 'resnet18' in model_name:
-            num_block = [3, 4, 6, 3]  # Adjust for smaller models if needed
+            num_block = [3, 4, 6, 3]
         else:
             raise NotImplementedError('Backbone architecture not recognized!')
 
@@ -100,37 +101,26 @@ class ResNet(nn.Module):
         self.conv4_x = self._make_layer(BottleNeck, 256, num_block[2], 2)
         self.conv5_x = self._make_layer(BottleNeck, 512, num_block[3], 2)
 
-        # Remove avg_pool and fc
-        self.avg_pool = None
-        self.fc = None
+        self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
 
-        # Handle pretrained weights
         if pretrained:
-            # Note: This implementation does not support pretrained weights natively.
-            # You can add torchvision.models.resnet50(weights='IMAGENET1K_V1') and transfer weights manually if needed.
-            pass
-
-        # Freeze layers
-        if pretrained and layers_to_freeze >= 0:
             for param in self.conv1.parameters():
                 param.requires_grad = False
-        if pretrained and layers_to_freeze >= 1:
-            for param in self.conv2_x.parameters():
-                param.requires_grad = False
-        if pretrained and layers_to_freeze >= 2:
-            for param in self.conv3_x.parameters():
-                param.requires_grad = False
-        if pretrained and layers_to_freeze >= 3:
-            for param in self.conv4_x.parameters():
-                param.requires_grad = False
+            if layers_to_freeze >= 1:
+                for param in self.conv2_x.parameters():
+                    param.requires_grad = False
+            if layers_to_freeze >= 2:
+                for param in self.conv3_x.parameters():
+                    param.requires_grad = False
+            if layers_to_freeze >= 3:
+                for param in self.conv4_x.parameters():
+                    param.requires_grad = False
 
-        # Crop layers
         if 4 in layers_to_crop:
             self.conv5_x = None
         if 3 in layers_to_crop:
             self.conv4_x = None
 
-        # Calculate out_channels
         out_channels = 2048
         if 'resnet34' in model_name or 'resnet18' in model_name:
             out_channels = 512
@@ -146,11 +136,21 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
+        B, C, H, W = x.shape
+
         x = self.conv1(x)
+        # print( " resnet_spd :::::::::::::::::::::::::::::::::::  ", x.shape ) # , x.shape , t.shape ) 
         x = self.conv2_x(x)
         x = self.conv3_x(x)
+        
+        
         if self.conv4_x is not None:
             x = self.conv4_x(x)
         if self.conv5_x is not None:
             x = self.conv5_x(x)
+
+        t = self.avg_pool(x)
+        t = t.view(B, -1)
+        if self.return_token:
+            return x, t
         return x

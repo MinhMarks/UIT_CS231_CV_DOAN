@@ -82,8 +82,8 @@ class VPRModel(pl.LightningModule):
         
     # the forward pass of the lightning model
     def forward(self, x):
-        x = self.backbone(x)
-        x = self.aggregator(x)
+        x, t = self.backbone(x)
+        x = self.aggregator(x, t)
         return x
     
     # configure the optimizer 

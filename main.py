@@ -5,12 +5,12 @@ from dataloaders.GSVCitiesDataloader import GSVCitiesDataModule
 
 if __name__ == '__main__':        
     datamodule = GSVCitiesDataModule(
-        batch_size=16,
+        batch_size=4,
         img_per_place=4,
         min_img_per_place=4,
         shuffle_all=False, # shuffle all images or keep shuffling in-city only
         random_sample_from_each_place=True,
-        image_size=(126, 126),
+        image_size=(112, 112),
         num_workers=10,
         show_data_stats=True,
         val_set_names= [] # ['pitts30k_val', 'pitts30k_test', 'msls_val'], # pitts30k_val, pitts30k_test, msls_val
@@ -20,15 +20,15 @@ if __name__ == '__main__':
         #---- Encoder
         backbone_arch='resnet50',  # Đổi thành tên tùy chỉnh cho ResNet SPD
         backbone_config={
-            'model_name': 'resnet50',  # Có thể là resnet50, resnet101, v.v.
             'pretrained': False,  # Tùy chọn, hiện tại ResNet SPD không hỗ trợ pretrained
             'layers_to_freeze': 2,
             'layers_to_crop': [4],  # Ví dụ: crop layer4 để giảm out_channels
+            'return_token' : True 
         },
         
         agg_arch='SALAD',
         agg_config={
-            'num_channels': 768,
+            'num_channels': 1024,
             'num_clusters': 64,
             'cluster_dim': 128,
             'token_dim': 256,
