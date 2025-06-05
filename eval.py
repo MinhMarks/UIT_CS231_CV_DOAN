@@ -72,16 +72,17 @@ def get_descriptors(model, dataloader, device):
 
 def load_model(ckpt_path):
     model = VPRModel(
-        backbone_arch='resnet50',
+         backbone_arch='resnet50',  # Đổi thành tên tùy chỉnh cho ResNet SPD
         backbone_config={
-            'model_name': 'resnet50',
-            'pretrained': False,
+            'pretrained': False,  # Tùy chọn, hiện tại ResNet SPD không hỗ trợ pretrained
             'layers_to_freeze': 2,
-            'layers_to_crop': [4],
+            'layers_to_crop': [4],  # Ví dụ: crop layer4 để giảm out_channels
+            'return_token' : True 
         },
+        
         agg_arch='SALAD',
         agg_config={
-            'num_channels': 1024,  # Khớp với out_channels của ResNet50 SPD khi crop layer4
+            'num_channels': 1024,
             'num_clusters': 64,
             'cluster_dim': 128,
             'token_dim': 256,
@@ -153,10 +154,13 @@ if __name__ == '__main__':
         r_list = descriptors[ : num_references]
         q_list = descriptors[num_references : ]
 
+        print("*"*50 ) 
         print('total_size', descriptors.shape[0], num_queries + num_references)
-
+        print("*"*50 ) 
+    
         # testing = True # isinstance(val_dataset, MSLSTest)
 
+        
         preds = get_validation_recalls(
             r_list=r_list,
             q_list=q_list,
