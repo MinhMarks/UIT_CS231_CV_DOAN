@@ -3,12 +3,15 @@ from torch.utils.data import DataLoader
 import torchvision.transforms as T
 from tqdm import tqdm
 import argparse
-
-
+import matplotlib.pyplot as plt
+import torchvision.transforms.functional as TF
 from vpr_model import VPRModel
 from utils.validation import get_validation_recalls
 # Dataloader
 from dataloaders.val.NordlandDataset import NordlandDataset
+import torchvision.transforms.functional as TF
+import matplotlib.pyplot as plt
+import os
 # from dataloaders.val.MapillaryDataset import MSLS
 # from dataloaders.val.MapillaryTestDataset import MSLSTest
 # from dataloaders.val.PittsburghDataset import PittsburghDataset
@@ -70,6 +73,14 @@ def get_descriptors(model, dataloader, device):
 
     return torch.cat(descriptors)
 
+def denormalize(tensor, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]):
+    """
+    Giúp khôi phục ảnh từ dạng normalized về dạng hiển thị được (0-1 range).
+    """
+    for t, m, s in zip(tensor, mean, std):
+        t.mul_(s).add_(m)  # t = t * std + mean
+    return torch.clamp(tensor, 0, 1)
+    
 def load_model(ckpt_path):
     model = VPRModel(
         backbone_arch='dinov2_vitb14',
@@ -152,8 +163,9 @@ if __name__ == '__main__':
         r_list = descriptors[ : num_references]
         q_list = descriptors[num_references : ]
 
-        print('total_size', descriptors.shape[0], num_queries + num_references)
+        print('total_size', descriptors.shape[0], num_queries + num_references) 
 
+        # descriptors dimension is 8448 
         # testing = True # isinstance(val_dataset, MSLSTest)
 
         preds = get_validation_recalls(
@@ -166,6 +178,36 @@ if __name__ == '__main__':
             faiss_gpu=False,
             testing=False,
         )
+
+        # Chọn 2 query để hiển thị
+        
+        for q_idx in [1000, 1, 2020, 40, 60, 100, 300, 700, 800, 14, 50 ]:
+            print(f"\nQuery index: {q_idx}")
+            pred_ids = preds[q_idx][:7]  # top-4 predictions
+        
+            # Lấy ảnh query và reference từ dataset (tensor), rồi denormalize để hiển thị
+            query_img, _ = val_dataset[num_references + q_idx]
+            query_img = denormalize(query_img.clone())
+            query_img_np = TF.to_pil_image(query_img)
+        
+            fig, axes = plt.subplots(1, 8, figsize=(15, 3))
+            axes[0].imshow(query_img_np)
+            axes[0].set_title("Query")
+            axes[0].axis('off')
+        
+            for i, pred_id in enumerate(pred_ids):
+                ref_img, _ = val_dataset[pred_id]
+                ref_img = denormalize(ref_img.clone())
+                ref_img_np = TF.to_pil_image(ref_img)
+        
+                axes[i+1].imshow(ref_img_np)
+                axes[i+1].set_title(f"Top-{i+1}")
+                axes[i+1].axis('off')
+        
+            plt.tight_layout()
+            plt.savefig(f"./query_{q_idx}_top4.png")
+            plt.close()
+
 
         # print( preds ) 
         

@@ -23,6 +23,7 @@ def get_validation_recalls(r_list, q_list, k_values, gt, print_results=True, fai
         # search for queries in the index
         _, predictions = faiss_index.search(q_list, max(k_values))
 
+        
         if testing:
             return predictions
 
@@ -45,4 +46,4 @@ def get_validation_recalls(r_list, q_list, k_values, gt, print_results=True, fai
             table.add_row(['Recall@K']+ [f'{100*v:.2f}' for v in correct_at_k])
             print(table.get_string(title=f"Performances on {dataset_name}"))
 
-        return d
+        return predictions
