@@ -8,6 +8,10 @@ import torchvision.transforms.functional as TF
 from vpr_model import VPRModel
 from utils.validation import get_validation_recalls
 # Dataloader
+import faiss
+import faiss.contrib.torch_utils
+from prettytable import PrettyTable
+
 from dataloaders.val.NordlandDataset import NordlandDataset
 import torchvision.transforms.functional as TF
 import matplotlib.pyplot as plt
@@ -153,7 +157,9 @@ if __name__ == '__main__':
     model = load_model(args.ckpt_path)
 
     for val_name in args.val_datasets:
+        print( type(val_name)) 
         val_dataset, num_references, num_queries, ground_truth = get_val_dataset(val_name, args.image_size)
+        print( "iamge size : " , args.image_size) 
         val_loader = DataLoader(val_dataset, num_workers=16, batch_size=args.batch_size, shuffle=False, pin_memory=True)
 
         print(f'Evaluating on {val_name}')
