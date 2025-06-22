@@ -1,6 +1,28 @@
 import math
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+
+class SelfAttention(nn.Module):
+    # ... (code from section 1)
+    def __init__(self, in_channels):
+        super().__init__()
+        self.in_channels = in_channels
+        self.query = nn.Conv2d(in_channels, in_channels // 8, 1)
+        self.key = nn.Conv2d(in_channels, in_channels // 8, 1)
+        self.value = nn.Conv2d(in_channels, in_channels, 1)
+        self.gamma = nn.Parameter(torch.zeros(1))
+    def forward(self, x):
+        B, C, H, W = x.size()
+        query_proj = self.query(x).view(B, -1, H * W).permute(0, 2, 1)
+        key_proj = self.key(x).view(B, -1, H * W)
+        energy = torch.bmm(query_proj, key_proj)
+        attention_weights = F.softmax(energy, dim=-1)
+        value_proj = self.value(x).view(B, C, H * W)
+        out = torch.bmm(value_proj, attention_weights.permute(0, 2, 1))
+        out = out.view(B, C, H, W)
+        out = self.gamma * out + x
+        return out
 
 # Code adapted from OpenGlue, MIT license
 # https://github.com/ucuapps/OpenGlue/blob/main/models/superglue/optimal_transport.py
@@ -105,6 +127,7 @@ class SALAD(nn.Module):
         )
         # MLP for score matrix S
         self.score = nn.Sequential(
+            SelfAttention(self.num_channels),  
             nn.Conv2d(self.num_channels, 512, 1),
             dropout,
             nn.ReLU(),
