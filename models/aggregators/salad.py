@@ -104,6 +104,10 @@ class SALAD(nn.Module):
             nn.ReLU(),
             nn.Conv2d(512, self.num_clusters, 1),
         )
+
+        encoder_layer = nn.TransformerEncoderLayer(d_model=256, nhead=16, dim_feedforward=1024, activation="gelu", dropout=0.1, batch_first=False)
+        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=2) # Cross-image encoder
+
         # Dustbin parameter z
         self.dust_bin = nn.Parameter(torch.tensor(1.))
 
@@ -121,7 +125,12 @@ class SALAD(nn.Module):
 
         f = self.cluster_features(x).flatten(2)
         p = self.score(x).flatten(2)
-        t = self.token_features(t)
+
+
+        t = self.token_features(t) # Size của nó là [B, 768 xuống 256] 
+        t = t.unsqueeze(1)          # [B, 1, 256]        
+        t = self.encoder(t) 
+        t = torch.nn.functional.normalize(t, p=2, dim=-1)
 
         # Sinkhorn algorithm
         p = get_matching_probs(p, self.dust_bin, 3)
@@ -133,6 +142,9 @@ class SALAD(nn.Module):
         p = p.unsqueeze(1).repeat(1, self.cluster_dim, 1, 1)
         f = f.unsqueeze(2).repeat(1, 1, self.num_clusters, 1)
 
+        t = t.squeeze(1) # [B,1,256] -> [B, 256]
+
+        # Concatenate the normalized token and the aggregated local features
         f = torch.cat([
             nn.functional.normalize(t, p=2, dim=-1),
             nn.functional.normalize((f * p).sum(dim=-1), p=2, dim=1).flatten(1)
