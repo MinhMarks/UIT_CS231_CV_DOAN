@@ -17,7 +17,7 @@ if __name__ == '__main__':
     )
     
     model = VPRModel(
-        ---- Encoder
+        # ---- Encoder
         backbone_arch='dinov2_vitb14',
         backbone_config={
             'num_trainable_blocks': 4,
