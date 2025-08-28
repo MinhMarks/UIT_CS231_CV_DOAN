@@ -14,7 +14,7 @@ default_transform = T.Compose([
 ])
 
 # NOTE: Hard coded path to dataset folder 
-BASE_PATH = '../salad/datasets/GSVcities/'
+BASE_PATH = '/kaggle/input/gsv-cities/'
 
 if not Path(BASE_PATH).exists():
     raise FileNotFoundError(

@@ -10,9 +10,8 @@ from torch.utils.data import Dataset
 # I hardcoded the image names and ground truth for faster evaluation
 # performance is exactly the same as if you use VPR-Bench.
 
-
-GT_ROOT = '../salad/datasets/'
-DATASET_ROOT = '../salad/datasets/Nordland/Nordland/' # BECAREFUL, this is the ground truth that comes with GSV-Cities
+DATASET_ROOT = '../data/Nordland/'
+GT_ROOT = './datasets/' # BECAREFUL, this is the ground truth that comes with GSV-Cities
 
 path_obj = Path(DATASET_ROOT)
 if not path_obj.exists():
@@ -53,10 +52,3 @@ class NordlandDataset(Dataset):
 
     def __len__(self):
         return len(self.images)
-
-    def save_predictions(self, preds, path):
-        with open("preds.txt", 'w') as f:
-            for i in range(len(preds)):
-                q = Path(self.qImages[i]).stem
-                db = ' '.join([Path(self.dbImages[j]).stem for j in preds[i]])
-                f.write(f"{q} {db}\n")

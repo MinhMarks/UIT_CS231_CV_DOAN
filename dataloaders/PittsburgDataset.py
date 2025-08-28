@@ -9,7 +9,7 @@ import torch.utils.data as data
 from PIL import Image, UnidentifiedImageError
 from sklearn.neighbors import NearestNeighbors
 
-root_dir = '../salad/datasets/GSVcities'
+root_dir = '/kaggle/input/pittsburgh250k'
 
 if not exists(root_dir):
     raise FileNotFoundError(

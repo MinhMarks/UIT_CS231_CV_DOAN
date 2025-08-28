@@ -13,7 +13,7 @@ if __name__ == '__main__':
         image_size=(126, 126),
         num_workers=10,
         show_data_stats=True,
-        val_set_names= [] # ['pitts30k_val', 'pitts30k_test', 'msls_val'], # pitts30k_val, pitts30k_test, msls_val
+        val_set_names= ['msls_val', 'pitts30k_val' ] # ['pitts30k_val', 'pitts30k_test', 'msls_val'], # pitts30k_val, pitts30k_test, msls_val
     )
     
     model = VPRModel(
@@ -28,8 +28,8 @@ if __name__ == '__main__':
         agg_arch='SALAD',
         agg_config={
             'num_channels': 768,
-            'num_clusters': 64,
-            'cluster_dim': 128,
+            'num_clusters': 128,
+            'cluster_dim': 64,
             'token_dim': 256,
         },
         lr = 6e-5,

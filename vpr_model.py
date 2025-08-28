@@ -194,13 +194,16 @@ class VPRModel(pl.LightningModule):
     def validation_step(self, batch, batch_idx, dataloader_idx=None):
         places, _ = batch
         descriptors = self(places)
+        if dataloader_idx is None:
+            dataloader_idx = 0
         self.val_outputs[dataloader_idx].append(descriptors.detach().cpu())
         return descriptors.detach().cpu()
     
     def on_validation_epoch_start(self):
         # reset the outputs list
         self.val_outputs = [[] for _ in range(len(self.trainer.datamodule.val_datasets))]
-    
+
+        
     def on_validation_epoch_end(self):
         """this return descriptors in their order
         depending on how the validation dataset is implemented 
