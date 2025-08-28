@@ -7,8 +7,8 @@ import numpy as np
 from PIL import Image
 from pathlib import Path
 
-DATASET_ROOT = '../data/mapillary/'
-GT_ROOT = './datasets/' # BECAREFUL, this is the ground truth that comes with GSV-Cities
+DATASET_ROOT = '/kaggle/input/msls-dataset/'
+GT_ROOT = '/kaggle/input/salad/pytorch/mn_saladv21/1/datasets/msls_val/'
 
 class MSLSTest(Dataset):
     def __init__(self, input_transform = None):

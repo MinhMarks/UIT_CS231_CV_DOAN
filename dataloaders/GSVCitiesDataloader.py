@@ -6,6 +6,8 @@ from dataloaders.GSVCitiesDataset import GSVCitiesDataset
 from . import PittsburgDataset
 from . import MapillaryDataset
 
+MapillaryDataset.DATA_INDEX_ROOT = '/kaggle/input/salad/pytorch/mn_saladv21/1/datasets/msls_val/'
+
 from prettytable import PrettyTable
 
 IMAGENET_MEAN_STD = {'mean': [0.485, 0.456, 0.406], 
