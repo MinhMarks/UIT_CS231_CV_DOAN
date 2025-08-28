@@ -28,8 +28,8 @@ if __name__ == '__main__':
         agg_arch='SALAD',
         agg_config={
             'num_channels': 768,
-            'num_clusters': 128,
-            'cluster_dim': 64,
+            'num_clusters': 64,
+            'cluster_dim': 128,
             'token_dim': 256,
         },
         lr = 6e-5,
