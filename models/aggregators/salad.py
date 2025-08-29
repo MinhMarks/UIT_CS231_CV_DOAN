@@ -107,7 +107,8 @@ class SALAD(nn.Module):
 
         encoder_layer = nn.TransformerEncoderLayer(d_model=256, nhead=16, dim_feedforward=1024, activation="gelu", dropout=0.1, batch_first=False)
         self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=2) # Cross-image encoder
-
+        #  131072 parameters 
+ 
         # Dustbin parameter z
         self.dust_bin = nn.Parameter(torch.tensor(1.))
 
