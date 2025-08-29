@@ -20,7 +20,7 @@ if __name__ == '__main__':
         # ---- Encoder
         backbone_arch='dinov2_vitb14',
         backbone_config={
-            'num_trainable_blocks': 4,
+            'num_trainable_blocks': 0,
             'return_token': True,
             'norm_layer': True,
         },
@@ -28,8 +28,8 @@ if __name__ == '__main__':
         agg_arch='SALAD',
         agg_config={
             'num_channels': 768,
-            'num_clusters': 128,
-            'cluster_dim': 64,
+            'num_clusters': 64,
+            'cluster_dim': 128,
             'token_dim': 256,
         },
         lr = 6e-5,
