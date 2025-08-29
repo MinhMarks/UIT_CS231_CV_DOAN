@@ -9,7 +9,7 @@ from torch.utils.data import Dataset
 # I hardcoded the groundtruth for image to image evaluation, otherwise it would take ages to run the groundtruth script at each epoch.
 
 DATASET_ROOT = '/kaggle/input/msls-dataset/'
-DATA_INDEX_ROOT = '/kaggle/input/salad/pytorch/mn_saladv21/1/datasets/msls_val/'
+DATA_INDEX_ROOT = '/kaggle/input/salad/pytorch/crosssalad1/1/datasets/msls_val/'
 
 path_obj = Path(DATASET_ROOT)
 if not path_obj.exists():       
@@ -48,16 +48,16 @@ class MSLS(Dataset):
         self.input_transform = input_transform
         
         # hard coded reference image names, this avoids the hassle of listing them at each epoch.
-        self.dbImages = np.load('/kaggle/input/salad/pytorch/mn_saladv21/1/datasets/msls_val/msls_val_dbImages.npy')
+        self.dbImages = np.load('/kaggle/input/salad/pytorch/crosssalad1/1/datasets/msls_val/msls_val_dbImages.npy')
         
         # hard coded query image names.
-        self.qImages = np.load('/kaggle/input/salad/pytorch/mn_saladv21/1/datasets/msls_val/msls_val_qImages.npy')
+        self.qImages = np.load('/kaggle/input/salad/pytorch/crosssalad1/1/datasets/msls_val/msls_val_qImages.npy')
         
         # hard coded index of query images
-        self.qIdx = np.load('/kaggle/input/salad/pytorch/mn_saladv21/1/datasets/msls_val/msls_val_qIdx.npy')
+        self.qIdx = np.load('/kaggle/input/salad/pytorch/crosssalad1/1/datasets/msls_val/msls_val_qIdx.npy')
         
         # hard coded groundtruth (correspondence between each query and its matches)
-        self.pIdx = np.load('/kaggle/input/salad/pytorch/mn_saladv21/1/datasets/msls_val/msls_val_pIdx.npy', allow_pickle=True)
+        self.pIdx = np.load('/kaggle/input/salad/pytorch/crosssalad1/1/datasets/msls_val/msls_val_pIdx.npy', allow_pickle=True)
         
         # concatenate reference images then query images so that we can use only one dataloader
         self.images = np.concatenate((self.dbImages, self.qImages[self.qIdx]))
