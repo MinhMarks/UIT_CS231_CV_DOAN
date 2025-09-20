@@ -3,7 +3,8 @@ import pytorch_lightning as pl
 from vpr_model import VPRModel
 from dataloaders.GSVCitiesDataloader import GSVCitiesDataModule
 
-if __name__ == '__main__':        
+if __name__ == '__main__':
+
     datamodule = GSVCitiesDataModule(
         batch_size=16,
         img_per_place=4,
@@ -32,6 +33,7 @@ if __name__ == '__main__':
             'cluster_dim': 128,
             'token_dim': 256,
         },
+
         lr = 6e-5,
         optimizer='adamw',
         weight_decay=9.5e-9, # 0.001 for sgd and 0 for adam,
@@ -50,6 +52,7 @@ if __name__ == '__main__':
         miner_name='MultiSimilarityMiner', # example: TripletMarginMiner, MultiSimilarityMiner, PairMarginMiner
         miner_margin=0.1,
         faiss_gpu=False
+        
     )
 
     # model params saving using Pytorch Lightning
@@ -71,14 +74,14 @@ if __name__ == '__main__':
         devices=1,
         default_root_dir=f'./logs/', # Tensorflow can be used to viz 
         num_nodes=1,
-        num_sanity_val_steps=0, # runs a validation step before stating training
+        num_sanity_val_steps=1, # runs a validation step before stating training
         precision='16-mixed', # we use half precision to reduce  memory usage
         max_epochs=4,
         check_val_every_n_epoch=1, # run validation every epoch
         callbacks=[checkpoint_cb],# we only run the checkpointing callback (you can add more)
         reload_dataloaders_every_n_epochs=1, # we reload the dataset to shuffle the order
         log_every_n_steps=20,
-    )
+    )   
 
     # we call the trainer, we give it the model and the datamodule
     trainer.fit(model=model, datamodule=datamodule)
