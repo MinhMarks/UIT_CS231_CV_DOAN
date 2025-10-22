@@ -5,7 +5,7 @@ from dataloaders.GSVCitiesDataloader import GSVCitiesDataModule
 
 if __name__ == '__main__':        
     datamodule = GSVCitiesDataModule(
-        batch_size=16,
+        batch_size=40,
         img_per_place=4,
         min_img_per_place=4,
         shuffle_all=False, # shuffle all images or keep shuffling in-city only
