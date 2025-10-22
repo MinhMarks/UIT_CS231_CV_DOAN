@@ -136,8 +136,7 @@ class SALAD(nn.Module):
 
         p = p[:, :-1, :] # p shape: [B, num_clusters, num_patches] 
 
-        # Ý tưởng là các feature không phải cái nào cũng quan trọng như nhau
-        p = self.p_transform(p.transpose(1,2)).transpose(1,2) 
+        p = self.p_transform(p.transpose(1,2)).transpose(1,2) # Gán lại 
         
         
         # Normalize to maintain mass
