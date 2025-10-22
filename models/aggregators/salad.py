@@ -105,12 +105,28 @@ class SALAD(nn.Module):
             nn.Conv2d(512, self.num_clusters, 1),
         )
 
-        encoder_layer = nn.TransformerEncoderLayer(d_model=256, nhead=16, dim_feedforward=1024, activation="gelu", dropout=0.1, batch_first=False)
-        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=2) # Cross-image encoder
-        #  131072 parameters 
- 
+
+        # Cho qua một encoder nhỏ để học mối quan hệ cross-image
+        self.place_encoder = nn.Sequential(
+            nn.Conv1d(cluster_dim, cluster_dim, kernel_size=1),
+            nn.ReLU(),
+            nn.Conv1d(cluster_dim, cluster_dim, kernel_size=1)
+        )
+
         # Dustbin parameter z
         self.dust_bin = nn.Parameter(torch.tensor(1.))
+
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model= cluster_dim * num_clusters,              # embedding dimension
+            nhead=8,                 # số "đầu" attention song song
+            dim_feedforward=1024,     # độ rộng MLP bên trong
+            activation="gelu",        # hàm kích hoạt cho FFN
+            dropout=0.1,              # tỉ lệ dropout
+            batch_first=False         # input shape [seq_len, batch, dim]
+        )
+
+        self.cross_image_encoder = nn.TransformerEncoder(encoder_layer, num_layers=2)
+
 
 
     def forward(self, x):
@@ -124,33 +140,59 @@ class SALAD(nn.Module):
         """
         x, t = x # Extract features and token
 
-        f = self.cluster_features(x).flatten(2)
+        # x [ B, C , H, W ] 
+        f = self.cluster_features(x).flatten(2) # [batch , cluster_dim, num_patch]
         p = self.score(x).flatten(2)
-
-
-        t = self.token_features(t) # Size của nó là [B, 768 xuống 256] 
-        t = t.unsqueeze(1)          # [B, 1, 256]        
-        t = self.encoder(t) 
-        t = torch.nn.functional.normalize(t, p=2, dim=-1)
+        t = self.token_features(t)
 
         # Sinkhorn algorithm
         p = get_matching_probs(p, self.dust_bin, 3)
         p = torch.exp(p)
         # Normalize to maintain mass
-        p = p[:, :-1, :]
+        p = p[:, :-1, :] # [batch , num_cluster, num_patch]
 
 
-        p = p.unsqueeze(1).repeat(1, self.cluster_dim, 1, 1)
+        # [B, 1, num_clusters, num_patches] , [B, cluster_dim, num_clusters, num_patches] 
+        p = p.unsqueeze(1).repeat(1, self.cluster_dim, 1, 1) 
+
+        # [B, cluster_dim, 1, num_patches]  [B, cluster_dim, num_clusters, num_patches] 
         f = f.unsqueeze(2).repeat(1, 1, self.num_clusters, 1)
 
-        t = t.squeeze(1) # [B,1,256] -> [B, 256]
+        q = f * p                                  # [B, cluster_dim, num_clusters, num_patches]
+        s = q.sum(dim=-1)    # [B, cluster_dim, num_clusters] 
 
-        # Concatenate the normalized token and the aggregated local features
+
+        # -------------------------------
+        # KHAI THÁC TÍNH CHẤT CHUNG GIỮA 4 ẢNH TRONG CÙNG MỘT PLACE
+        # -------------------------------
+
+        B, cluster_dim, num_clusters = s.shape
+        img_per_place = 4
+        num_places = B // img_per_place
+
+        # Gom nhóm 4 ảnh theo từng place
+        s_place = s.view(num_places, img_per_place, cluster_dim, num_clusters)
+        
+        # Flatten cluster features
+        s_seq = s_place.flatten(2)  # [num_places, img_per_place, cluster_dim*num_clusters]
+
+        # Permute để phù hợp với Transformer
+        s_seq = s_seq.permute(1, 0, 2)  # [seq_len=img_per_place, batch=num_places, embed_dim]
+
+        s_encoded = self.cross_image_encoder(s_seq) 
+
+        # Chuyển ngược về [B, cluster_dim, num_clusters]
+        s_encoded = s_encoded.permute(1, 0, 2)  # [num_places, img_per_place, embed_dim]
+        s_encoded = s_encoded.contiguous().view(B, cluster_dim, num_clusters)
+
+        s = s + s_encoded  # residual enhancement
+
         f = torch.cat([
             nn.functional.normalize(t, p=2, dim=-1),
-            nn.functional.normalize((f * p).sum(dim=-1), p=2, dim=1).flatten(1)
+
+            #  nhân từng phân tử với từng mẫu và cộng dồn theo chiều patches 
+            #  [B, cluster_dim, num_clusters] 
+            nn.functional.normalize(s, p=2, dim=1).flatten(1)
         ], dim=-1)
 
         return nn.functional.normalize(f, p=2, dim=-1)
-
-
