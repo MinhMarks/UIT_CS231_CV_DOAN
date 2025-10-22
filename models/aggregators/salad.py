@@ -104,14 +104,13 @@ class SALAD(nn.Module):
             nn.ReLU(),
             nn.Conv2d(512, self.num_clusters, 1),
         )
-
-        encoder_layer = nn.TransformerEncoderLayer(d_model=256, nhead=16, dim_feedforward=1024, activation="gelu", dropout=0.1, batch_first=False)
-        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=2) # Cross-image encoder
-        #  131072 parameters 
- 
         # Dustbin parameter z
         self.dust_bin = nn.Parameter(torch.tensor(1.))
-
+        self.place_encoder = nn.Sequential(
+            nn.Conv1d(cluster_dim, cluster_dim, kernel_size=1),
+            nn.ReLU(),
+            nn.Conv1d(cluster_dim, cluster_dim, kernel_size=1)
+        )
 
     def forward(self, x):
         """
@@ -126,12 +125,7 @@ class SALAD(nn.Module):
 
         f = self.cluster_features(x).flatten(2)
         p = self.score(x).flatten(2)
-
-
-        t = self.token_features(t) # Size của nó là [B, 768 xuống 256] 
-        t = t.unsqueeze(1)          # [B, 1, 256]        
-        t = self.encoder(t) 
-        t = torch.nn.functional.normalize(t, p=2, dim=-1)
+        t = self.token_features(t)
 
         # Sinkhorn algorithm
         p = get_matching_probs(p, self.dust_bin, 3)
@@ -139,18 +133,34 @@ class SALAD(nn.Module):
         # Normalize to maintain mass
         p = p[:, :-1, :]
 
+        
 
         p = p.unsqueeze(1).repeat(1, self.cluster_dim, 1, 1)
         f = f.unsqueeze(2).repeat(1, 1, self.num_clusters, 1)
+        q = f * p # [B, cluster_dim, num_clusters, num_patches]
+        s = q.sum(dim=-1) 
 
-        t = t.squeeze(1) # [B,1,256] -> [B, 256]
+        
+        # Cross-image (place-level) aggregation
+        B, cluster_dim, num_clusters = s.shape
+        img_per_place = 4
+        num_places = B // img_per_place
 
-        # Concatenate the normalized token and the aggregated local features
+        s_place = s.view(num_places, img_per_place, cluster_dim, num_clusters)
+        s_mean = s_place.mean(dim=1)  # [num_places, cluster_dim, num_clusters]
+
+        # Place-level encoder
+        s_place_encoded = self.place_encoder(s_mean)
+        s_place_encoded = s_place_encoded.unsqueeze(1).repeat(1, img_per_place, 1, 1)
+        s_place_encoded = s_place_encoded.view(B, cluster_dim, num_clusters)
+
+        # Combine
+        s = s + s_place_encoded
+
         f = torch.cat([
             nn.functional.normalize(t, p=2, dim=-1),
-            nn.functional.normalize((f * p).sum(dim=-1), p=2, dim=1).flatten(1)
+            nn.functional.normalize(s, p=2, dim=1).flatten(1)
         ], dim=-1)
 
         return nn.functional.normalize(f, p=2, dim=-1)
-
-
+        
