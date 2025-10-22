@@ -105,10 +105,13 @@ class SALAD(nn.Module):
             nn.Conv2d(512, self.num_clusters, 1),
         )
 
-        encoder_layer = nn.TransformerEncoderLayer(d_model=256, nhead=16, dim_feedforward=1024, activation="gelu", dropout=0.1, batch_first=False)
-        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=2) # Cross-image encoder
-        #  131072 parameters 
- 
+        self.p_transform = nn.Sequential(
+            nn.Linear(self.num_clusters, self.num_clusters),
+            nn.ReLU(),
+            nn.Linear(self.num_clusters, self.num_clusters),
+            nn.Sigmoid()   # optional, để giữ p ∈ [0,1]
+        )
+
         # Dustbin parameter z
         self.dust_bin = nn.Parameter(torch.tensor(1.))
 
@@ -126,31 +129,27 @@ class SALAD(nn.Module):
 
         f = self.cluster_features(x).flatten(2)
         p = self.score(x).flatten(2)
-
-
-        t = self.token_features(t) # Size của nó là [B, 768 xuống 256] 
-        t = t.unsqueeze(1)          # [B, 1, 256]        
-        t = self.encoder(t) 
-        t = torch.nn.functional.normalize(t, p=2, dim=-1)
+        t = self.token_features(t)
 
         # Sinkhorn algorithm
         p = get_matching_probs(p, self.dust_bin, 3)
-        p = torch.exp(p)
+
+        p = p[:, :-1, :] # p shape: [B, num_clusters, num_patches] 
+
+        # Ý tưởng là các feature không phải cái nào cũng quan trọng như nhau
+        p = self.p_transform(p.transpose(1,2)).transpose(1,2) 
+        
+        
         # Normalize to maintain mass
-        p = p[:, :-1, :]
+        p = torch.exp(p)
 
 
         p = p.unsqueeze(1).repeat(1, self.cluster_dim, 1, 1)
         f = f.unsqueeze(2).repeat(1, 1, self.num_clusters, 1)
 
-        t = t.squeeze(1) # [B,1,256] -> [B, 256]
-
-        # Concatenate the normalized token and the aggregated local features
         f = torch.cat([
             nn.functional.normalize(t, p=2, dim=-1),
             nn.functional.normalize((f * p).sum(dim=-1), p=2, dim=1).flatten(1)
         ], dim=-1)
 
         return nn.functional.normalize(f, p=2, dim=-1)
-
-
