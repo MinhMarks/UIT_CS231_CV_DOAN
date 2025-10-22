@@ -53,7 +53,8 @@ class MSLS(Dataset):
                 if meta.loc[meta["key"] == img_name, "night"].values[0] == 1:  # night only
                     filtered_q.append(path)
                     filtered_qIdx.append(idx)
-                    
+
+        print(" Khong con gi de noi ")       
         self.qImages = np.array(filtered_q)
         self.qIdx = np.array(filtered_qIdx)
 
