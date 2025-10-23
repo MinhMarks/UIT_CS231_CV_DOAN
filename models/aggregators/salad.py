@@ -138,7 +138,7 @@ class SALAD(nn.Module):
         p = p.unsqueeze(1).repeat(1, self.cluster_dim, 1, 1)
         f = f.unsqueeze(2).repeat(1, 1, self.num_clusters, 1)
         q = f * p # [B, cluster_dim, num_clusters, num_patches]
-        s = q.sum(dim=-1) 
+        s = q.sum(dim=-1) # [B, cluster_dim, num_clusters]
 
         
         # Cross-image (place-level) aggregation
