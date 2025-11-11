@@ -165,6 +165,15 @@ class VPRModel(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx, dataloader_idx=None):
         places, _ = batch
+        
+        B = places[0].shape[0] if isinstance(places, tuple) else places.shape[0]
+
+        # ✅ Nếu batch không đúng 40 ảnh → bỏ qua
+        expected_batch_size = 40
+        if B != expected_batch_size:
+            print(f"⚠️ Bỏ qua batch {batch_idx}: kích thước {B} ≠ {expected_batch_size}")
+            return None  # Không tính batch này
+        
         descriptors = self(places)
         
         # Handle dataloader_idx properly
