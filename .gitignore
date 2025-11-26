@@ -1,5 +1,8 @@
 # salad 
 
+baselines/
+datasets/gsv-cities/
+
 logs/lightning_logs
 
 logs/lightning_logs/version_3
