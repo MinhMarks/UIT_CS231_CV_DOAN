@@ -6,7 +6,7 @@ from dataloaders.GSVCitiesDataset import GSVCitiesDataset
 # from . import PittsburgDataset
 from . import MapillaryDataset
 
-MapillaryDataset.DATA_INDEX_ROOT = '/kaggle/input/salad/pytorch/crosssalad1/1/datasets/msls_val/'
+# MapillaryDataset.DATA_INDEX_ROOT = '/kaggle/input/salad/pytorch/crosssalad1/1/datasets/msls_val/'
 
 from prettytable import PrettyTable
 

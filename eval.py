@@ -9,13 +9,13 @@ from vpr_model import VPRModel
 from utils.validation import get_validation_recalls
 # Dataloader
 from dataloaders.val.NordlandDataset import NordlandDataset
-# from dataloaders.val.MapillaryDataset import MSLS
+from dataloaders.val.MapillaryDataset import MSLS
 # from dataloaders.val.MapillaryTestDataset import MSLSTest
 # from dataloaders.val.PittsburghDataset import PittsburghDataset
 # from dataloaders.val.SPEDDataset import SPEDDataset
 
 # VAL_DATASETS = ['MSLS', 'MSLS_Test', 'pitts30k_test', 'pitts250k_test', 'Nordland', 'SPED']
-VAL_DATASETS = ['Nordland']
+VAL_DATASETS = ['MSLS']
 
 
 def input_transform(image_size=None):
@@ -41,8 +41,8 @@ def get_val_dataset(dataset_name, image_size=None):
     # elif 'msls_test' in dataset_name:
     #     ds = MSLSTest(input_transform=transform)
 
-    # elif 'msls' in dataset_name:
-    #     ds = MSLS(input_transform=transform)
+    elif 'msls' in dataset_name:
+        ds = MSLS(input_transform=transform)
 
     # elif 'pitts' in dataset_name:
     #     ds = PittsburghDataset(which_ds=dataset_name, input_transform=transform)

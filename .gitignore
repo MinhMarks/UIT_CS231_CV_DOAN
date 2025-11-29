@@ -2,6 +2,7 @@
 
 baselines/
 datasets/gsv-cities/
+datasets/msls-dataset/
 
 logs/lightning_logs
 
@@ -16,6 +17,7 @@ datasets/Pittsburgh
 datasets/SPED
 datasets/Nordland/Nordland
 datasets/GSVcities
+datasets/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

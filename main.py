@@ -13,7 +13,7 @@ if __name__ == '__main__':
         image_size=(126, 126),
         num_workers=10,
         show_data_stats=True,
-        val_set_names= ['msls_val', 'pitts30k_val' ] # ['pitts30k_val', 'pitts30k_test', 'msls_val'], # pitts30k_val, pitts30k_test, msls_val
+        val_set_names= ['msls_val'] # No validation sets, just training on GSV
     )
     
     model = VPRModel(

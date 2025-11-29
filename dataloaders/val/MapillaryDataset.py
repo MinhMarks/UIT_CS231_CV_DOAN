@@ -1,10 +1,14 @@
 from torch.utils.data import Dataset
-
+import os
 import numpy as np
 from PIL import Image
 
-DATASET_ROOT = '/kaggle/input/msls-dataset/'
-GT_ROOT = '/kaggle/input/salad/pytorch/mn_saladv21/1/datasets/msls_val/'
+# Get project root directory (2 levels up from this file)
+_current_dir = os.path.dirname(os.path.abspath(__file__))
+_project_root = os.path.dirname(os.path.dirname(_current_dir))
+
+DATASET_ROOT = os.path.join(_project_root, 'datasets') + '/'
+GT_ROOT = os.path.join(_project_root, 'datasets', 'msls_val') + '/'
 
 class MSLS(Dataset):
     def __init__(self, input_transform = None):
@@ -12,11 +16,12 @@ class MSLS(Dataset):
 
         self.input_transform = input_transform
 
-        self.dbImages = np.load(GT_ROOT+'msls_val/msls_val_dbImages.npy')
-        self.qIdx = np.load(GT_ROOT+'msls_val/msls_val_qIdx.npy')
-        self.qImages = np.load(GT_ROOT+'msls_val/msls_val_qImages.npy')
-        self.ground_truth = np.load(GT_ROOT+'msls_val/msls_val_pIdx.npy', allow_pickle=True)
+        self.dbImages = np.load(os.path.join(GT_ROOT, 'msls_val_dbImages.npy'))
+        self.qIdx = np.load(os.path.join(GT_ROOT, 'msls_val_qIdx.npy'))
+        self.qImages = np.load(os.path.join(GT_ROOT, 'msls_val_qImages.npy'))
+        self.ground_truth = np.load(os.path.join(GT_ROOT, 'msls_val_pIdx.npy'), allow_pickle=True)
         
+        print(self.dbImages) 
         # reference images then query images
         self.images = np.concatenate((self.dbImages, self.qImages[self.qIdx]))
         self.num_references = len(self.dbImages)
