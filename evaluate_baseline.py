@@ -174,6 +174,9 @@ def main(args):
     # Load pretrained weights
     model = load_pretrained_weights(model, args.checkpoint)
 
+    # Setup datamodule
+    datamodule.setup(stage="fit")
+
     # Trainer
     trainer = pl.Trainer(
         accelerator="gpu" if torch.cuda.is_available() else "cpu",
