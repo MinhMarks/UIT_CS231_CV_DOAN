@@ -185,6 +185,8 @@ class SALAD(nn.Module):
         s_encoded = s_encoded.permute(1, 0, 2)  # [num_places, img_per_place, embed_dim]
         s_encoded = s_encoded.contiguous().view(B, cluster_dim, num_clusters)
 
+        s_encoded = nn.functional.normalize(s_encoded, p=2, dim=1)
+        # ==== Thêm normalize chho s_encoded ở đây 
         s = s + s_encoded  # residual enhancement
 
         f = torch.cat([
