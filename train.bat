@@ -3,6 +3,12 @@ REM ============================================================================
 REM Training script for SALAD with Cross-Image Learning (Windows)
 REM =============================================================================
 
+echo.
+echo ============================================================
+echo SALAD Cross-Image Training
+echo ============================================================
+echo.
+
 REM Option 1: Train with frozen base (only train CrossImageEncoder)
 python train_cross_image.py ^
     --pretrained_path pretrainedWeight/Salad/last.ckpt ^

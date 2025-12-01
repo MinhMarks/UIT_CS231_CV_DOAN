@@ -32,3 +32,19 @@ python train_cross_image.py \
 #     --epochs 10 \
 #     --lr 6e-5 \
 #     --log_dir ./logs/cross_image_scratch/
+
+# =============================================================================
+# Evaluation script
+# =============================================================================
+
+# Evaluate on MSLS validation set
+# python evaluate.py \
+#     --checkpoint ./logs/cross_image_frozen/cross_image_salad/freeze_True_lr_6e-05/checkpoints/last.ckpt \
+#     --val_sets msls_val \
+#     --batch_size 32
+
+# Evaluate on Pittsburgh
+# python evaluate.py \
+#     --checkpoint ./logs/cross_image_frozen/cross_image_salad/freeze_True_lr_6e-05/checkpoints/last.ckpt \
+#     --val_sets pitts30k_val,pitts30k_test \
+#     --batch_size 32

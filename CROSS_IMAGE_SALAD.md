@@ -90,6 +90,47 @@ db_desc = model.forward_database(x)
 2. **Validation**: Tự động dùng single-image mode (không cross-image)
 3. **Database embedding**: Cần group ảnh theo place khi dùng `forward_database()`
 
+## Scripts
+
+### Training
+```bash
+# Windows
+train.bat
+
+# Linux/Mac
+chmod +x train.sh
+./train.sh
+
+# Direct command
+python train_cross_image.py \
+    --pretrained_path pretrainedWeight/Salad/last.ckpt \
+    --freeze_base \
+    --batch_size 20 \
+    --epochs 4
+```
+
+### Evaluation
+```bash
+# Windows
+evaluate.bat
+
+# Linux/Mac
+python evaluate.py \
+    --checkpoint ./logs/cross_image_frozen/.../last.ckpt \
+    --val_sets msls_val \
+    --batch_size 32
+
+# Multiple validation sets
+python evaluate.py \
+    --checkpoint path/to/model.ckpt \
+    --val_sets msls_val,pitts30k_val,pitts30k_test
+```
+
+### TensorBoard
+```bash
+tensorboard --logdir ./logs/
+```
+
 ## Files
 
 | File | Mô tả |
@@ -97,6 +138,7 @@ db_desc = model.forward_database(x)
 | `models/aggregators/salad_base.py` | SALADBase module |
 | `models/aggregators/cross_image_encoder.py` | CrossImageEncoder module |
 | `models/aggregators/salad.py` | Combined SALAD |
-| `train_cross_image.py` | Training script với argparse |
-| `train.sh` | Shell script (Linux/Mac) |
-| `train.bat` | Batch script (Windows) |
+| `train_cross_image.py` | Training script với logging |
+| `evaluate.py` | Evaluation script |
+| `train.sh` / `train.bat` | Training scripts |
+| `evaluate.bat` | Evaluation script (Windows) |
