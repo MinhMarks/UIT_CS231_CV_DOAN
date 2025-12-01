@@ -31,6 +31,7 @@ if __name__ == '__main__':
             'num_clusters': 64,
             'cluster_dim': 128,
             'token_dim': 256,
+            'img_per_place': 4,  # Must match datamodule's img_per_place
         },
         lr = 6e-5,
         optimizer='adamw',

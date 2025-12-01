@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# =============================================================================
+# Training script for SALAD with Cross-Image Learning
+# =============================================================================
+
+# Option 1: Train with frozen base (only train CrossImageEncoder)
+# Recommended for first experiments
+python train_cross_image.py \
+    --pretrained_path pretrainedWeight/Salad/last.ckpt \
+    --freeze_base \
+    --batch_size 20 \
+    --img_per_place 4 \
+    --epochs 4 \
+    --lr 6e-5 \
+    --log_dir ./logs/cross_image_frozen/
+
+# Option 2: Fine-tune entire model (uncomment to use)
+# python train_cross_image.py \
+#     --pretrained_path pretrainedWeight/Salad/last.ckpt \
+#     --batch_size 20 \
+#     --img_per_place 4 \
+#     --epochs 4 \
+#     --lr 1e-5 \
+#     --log_dir ./logs/cross_image_finetune/
+
+# Option 3: Train from scratch without pretrained (uncomment to use)
+# python train_cross_image.py \
+#     --pretrained_path "" \
+#     --batch_size 20 \
+#     --img_per_place 4 \
+#     --epochs 10 \
+#     --lr 6e-5 \
+#     --log_dir ./logs/cross_image_scratch/
