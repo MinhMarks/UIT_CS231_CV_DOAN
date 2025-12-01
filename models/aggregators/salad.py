@@ -140,8 +140,49 @@ class SALAD(nn.Module):
         return self.base.build_descriptor(s, t)
 
     def forward_single(self, x):
-        """Forward for single image (query inference)."""
+        """Forward for single image (query inference) - no cross-image."""
         return self.base(x)
+
+    def forward_single_with_cross_image(self, x):
+        """
+        Forward for single image with cross-image enhancement.
+        Duplicates each image img_per_place times to apply cross-image.
+        
+        Args:
+            x: (features [B, C, H, W], token [B, C])
+        Returns:
+            descriptor [B, descriptor_dim]
+            
+        Note: When duplicating the same image, cross-image attention will
+        see identical inputs. The output will be consistent with training
+        distribution since it goes through the same layers.
+        """
+        features, token = x
+        B = features.shape[0]
+        
+        # Duplicate each image img_per_place times
+        # Use repeat_interleave to keep same image together:
+        # [img1, img1, img1, img1, img2, img2, img2, img2, ...]
+        features_dup = features.repeat_interleave(self.img_per_place, dim=0)  # [B*img_per_place, C, H, W]
+        token_dup = token.repeat_interleave(self.img_per_place, dim=0)  # [B*img_per_place, C]
+        
+        # Compute base features
+        s, t = self.base.compute_features((features_dup, token_dup))
+        
+        # Apply cross-image
+        # Each group of img_per_place will be the same image duplicated
+        s = self.cross_encoder(s)
+        
+        # Build descriptor for all duplicates
+        descriptors = self.base.build_descriptor(s, t)  # [B*img_per_place, descriptor_dim]
+        
+        # Reshape and take first (all duplicates should be identical after cross-image)
+        descriptors = descriptors.view(B, self.img_per_place, -1)[:, 0, :]  # [B, descriptor_dim]
+        
+        # Re-normalize after selection
+        descriptors = nn.functional.normalize(descriptors, p=2, dim=-1)
+        
+        return descriptors
 
     def forward_database(self, x):
         """
