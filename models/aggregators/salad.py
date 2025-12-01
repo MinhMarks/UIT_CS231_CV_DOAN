@@ -119,7 +119,7 @@ class SALAD(nn.Module):
         encoder_layer = nn.TransformerEncoderLayer(
             d_model= cluster_dim * num_clusters,              # embedding dimension
             nhead=8,                 # số "đầu" attention song song
-            dim_feedforward=1024,     # độ rộng MLP bên trong
+            dim_feedforward=8192,     # độ rộng MLP bên trong
             activation="gelu",        # hàm kích hoạt cho FFN
             dropout=0.1,              # tỉ lệ dropout
             batch_first=False         # input shape [seq_len, batch, dim]
