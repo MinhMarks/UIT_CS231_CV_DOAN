@@ -145,8 +145,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pretrained_path",
         type=str,
-        default="pretrainedWeight/Salad/last.ckpt",
-        help="Path to pretrained SALAD checkpoint",
+        default="",
+        help="Path to pretrained SALAD checkpoint (empty string to train from scratch)",
     )
     parser.add_argument(
         "--freeze_base",
