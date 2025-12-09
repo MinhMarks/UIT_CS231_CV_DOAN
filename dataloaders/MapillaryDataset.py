@@ -8,8 +8,8 @@ from torch.utils.data import Dataset
 # the folder named train_val should reside in DATASET_ROOT path (that's the only folder you need from mapillary_sls)
 # I hardcoded the groundtruth for image to image evaluation, otherwise it would take ages to run the groundtruth script at each epoch.
 
-DATASET_ROOT = 'datasets/'
-DATA_INDEX_ROOT = 'datasets/'
+DATASET_ROOT = '/kaggle/input/msls-dataset/'
+DATA_INDEX_ROOT = '/kaggle/input/salad/pytorch/crosssalad1/1/datasets/msls_val/'
 
 path_obj = Path(DATASET_ROOT)
 if not path_obj.exists():       
@@ -21,22 +21,43 @@ if not path_obj.joinpath('train_val'):
 class MSLS(Dataset):
     def __init__(self, input_transform = None):
         
+        # self.input_transform = input_transform
+        
+        # DATA_INDEX_ROOT = '/kaggle/input/salad/pytorch/mn_saladv21/1/datasets/msls_val/'
+
+        # print("DATA_INDEX_ROOT:", DATA_INDEX_ROOT)
+        # # hard coded reference image names, this avoids the hassle of listing them at each epoch.
+        # self.dbImages = np.load(DATA_INDEX_ROOT + 'msls_val_dbImages.npy')
+        
+        # # hard coded query image names.
+        # self.qImages = np.load(DATA_INDEX_ROOT + 'msls_val_qImages.npy')
+        
+        # # hard coded index of query images
+        # self.qIdx = np.load(DATA_INDEX_ROOT + 'msls_val_qIdx.npy')
+        
+        # # hard coded groundtruth (correspondence between each query and its matches)
+        # self.pIdx = np.load(DATA_INDEX_ROOT + 'msls_val_pIdx.npy', allow_pickle=True)
+        
+        # # concatenate reference images then query images so that we can use only one dataloader
+        # self.images = np.concatenate((self.dbImages, self.qImages[self.qIdx]))
+        
+        # # we need to keeo the number of references so that we can split references-queries 
+        # # when calculating recall@K
+        # self.num_references = len(self.dbImages)
+
         self.input_transform = input_transform
         
-        DATA_INDEX_ROOT = 'datasets/msls_val/'
-
-        print("DATA_INDEX_ROOT:", DATA_INDEX_ROOT)
         # hard coded reference image names, this avoids the hassle of listing them at each epoch.
-        self.dbImages = np.load(DATA_INDEX_ROOT + 'msls_val_dbImages.npy')
+        self.dbImages = np.load('/kaggle/input/salad/pytorch/crosssalad1/1/datasets/msls_val/msls_val_dbImages.npy')
         
         # hard coded query image names.
-        self.qImages = np.load(DATA_INDEX_ROOT + 'msls_val_qImages.npy')
+        self.qImages = np.load('/kaggle/input/salad/pytorch/crosssalad1/1/datasets/msls_val/msls_val_qImages.npy')
         
         # hard coded index of query images
-        self.qIdx = np.load(DATA_INDEX_ROOT + 'msls_val_qIdx.npy')
+        self.qIdx = np.load('/kaggle/input/salad/pytorch/crosssalad1/1/datasets/msls_val/msls_val_qIdx.npy')
         
         # hard coded groundtruth (correspondence between each query and its matches)
-        self.pIdx = np.load(DATA_INDEX_ROOT + 'msls_val_pIdx.npy', allow_pickle=True)
+        self.pIdx = np.load('/kaggle/input/salad/pytorch/crosssalad1/1/datasets/msls_val/msls_val_pIdx.npy', allow_pickle=True)
         
         # concatenate reference images then query images so that we can use only one dataloader
         self.images = np.concatenate((self.dbImages, self.qImages[self.qIdx]))
@@ -44,7 +65,6 @@ class MSLS(Dataset):
         # we need to keeo the number of references so that we can split references-queries 
         # when calculating recall@K
         self.num_references = len(self.dbImages)
-
     
     def __getitem__(self, index):
         img = Image.open(DATASET_ROOT+self.images[index])

@@ -11,10 +11,14 @@ python train_cross_image.py \
     --freeze_base \
     --batch_size 20 \
     --img_per_place 4 \
-    --epochs 4 \
+    --epochs 15 \
     --lr 6e-5 \
+    --num_trainable_blocks 4 \
+    --image_size 128 128\
+    --val_set_names \'msls_val\' \
+    --num_trainable_blocks 4
     --log_dir ./logs/cross_image_frozen/
-
+    
 # Option 2: Fine-tune entire model (uncomment to use)
 # python train_cross_image.py \
 #     --pretrained_path pretrainedWeight/Salad/last.ckpt \

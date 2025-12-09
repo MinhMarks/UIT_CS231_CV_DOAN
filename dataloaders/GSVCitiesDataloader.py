@@ -6,7 +6,7 @@ from dataloaders.GSVCitiesDataset import GSVCitiesDataset
 # from . import PittsburgDataset
 from . import MapillaryDataset
 
-# MapillaryDataset.DATA_INDEX_ROOT = '/kaggle/input/salad/pytorch/crosssalad1/1/datasets/msls_val/'
+MapillaryDataset.DATA_INDEX_ROOT = '/kaggle/input/salad/pytorch/crosssalad1/1/datasets/msls_val/'
 
 from prettytable import PrettyTable
 
@@ -89,14 +89,14 @@ class GSVCitiesDataModule(pl.LightningDataModule):
         self.train_loader_config = {
             'batch_size': self.batch_size,
             'num_workers': self.num_workers,
-            'drop_last': True,
+            'drop_last': False,
             'pin_memory': True,
             'shuffle': self.shuffle_all}
 
         self.valid_loader_config = {
             'batch_size': self.batch_size,
             'num_workers': self.num_workers//2,
-            'drop_last': True,
+            'drop_last': False,
             'pin_memory': True,
             'shuffle': False}
 
