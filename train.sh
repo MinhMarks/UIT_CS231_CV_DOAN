@@ -12,7 +12,7 @@ python train_cross_image.py \
     --epochs 15 \
     --lr 6e-5 \
     --num_trainable_blocks 4 \
-    --image_size 128 \
+    --image_size 126 \
     --val_sets msls_val \
     --log_dir ./logs/cross_image_frozen/
 
